@@ -12,7 +12,7 @@ module.exports = {
   userLogin: (req, res) => {
     loginUser(req.body, (error, results) => {
       if (error) {
-        failedResponse(res, JSON.stringify(error));
+        failedResponse(res, error.message, error.details);
       } else {
         successResponse(res, results, "Logged In Succesfully", "user");
       }
@@ -21,7 +21,7 @@ module.exports = {
   userRegister: (req, res) => {
     registerUser(req.body, (error, results) => {
       if (error) {
-        failedResponse(res, JSON.stringify(error));
+        failedResponse(res, error.message, error.details);
       } else {
         successResponse(res, results, "Registered Succesfully", "user");
       }

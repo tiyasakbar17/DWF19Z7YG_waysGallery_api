@@ -14,7 +14,8 @@ module.exports = {
       const { error } = schema.validate({ ...data }, { abortEarly: false });
 
       if (error) {
-        return callBack(error);
+        const details = error.details.map((detail) => detail.message.split('"').join("").split("\\").join(""));
+        return callBack({message: error.details[0].message.split('"').join("").split("\\").join(""), details});
       }
 
       const cekEmail = await user.findOne({
@@ -28,7 +29,7 @@ module.exports = {
       );
 
       if (!cekEmail || !validatingPassword) {
-        return callBack("Check Your Email Or Password");
+        return callBack({message: "Check Your Email Or Password"});
       } else {
         const userData = {
           id: cekEmail.id,
@@ -37,7 +38,7 @@ module.exports = {
         jwt.sign(userData, process.env.SECRET_KEY, (error, token) => {
           if (error) {
             console.log(error);
-            return callBack(error);
+            return callBack({message: JSON.stringify(error)});
           } else {
             const resultToSend = {
               email,
@@ -48,7 +49,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      callBack("Check Your Email Or Password");
+      callBack({message: "Check Your Email Or Password"});
     }
   },
   registerUser: async (data, callBack) => {
@@ -64,7 +65,8 @@ module.exports = {
         const { error } = schema.validate({ ...data }, { abortEarly: false });
 
         if (error) {
-          return callBack(error);
+          const details = error.details.map((detail) => detail.message.split('"').join("").split("\\").join(""));
+          return callBack({message: error.details[0].message.split('"').join("").split("\\").join(""), details});
         } else {
           const checkEmail = await user.findOne({
             where: {
@@ -73,7 +75,7 @@ module.exports = {
           });
 
           if (checkEmail) {
-            callBack("Use Another Email");
+            callBack({message: "Use Another Email"});
           } else {
             const hashedPassword = await bcrypt.hash(password, 10);
             const newUser = {
@@ -95,7 +97,7 @@ module.exports = {
               (error, token) => {
                 if (error) {
                   console.log(error);
-                  return callBack(error);
+                  return callBack({message: JSON.stringify(error)});
                 } else {
                   return callBack(null, token);
                 }
@@ -105,10 +107,10 @@ module.exports = {
         }
       } catch (error) {
         console.log(error);
-        return callBack(error);
+        return callBack({message: JSON.stringify(error)});
       }
     } catch (error) {
-      callBack(JSON.stringify(error));
+      return callBack({message: JSON.stringify(error)});
     }
   },
   dataLoad: async (data, callBack) => {
